@@ -176,11 +176,12 @@
  * This will require the use of an additional GPIO pin to control
  * the read and write modes of the ICs.
  */
-//#define SN7516X
+// Mod JDB: SN75160/SN75161 bus drivers (SC not used, pin 12 is EOI)
+#define SN7516X
 #ifdef SN7516X
 /*** Jay Diddy B board ***/
-//  #define SN7516X_TE 6
-//  #define SN7516X_DC 13
+  #define SN7516X_TE 6
+  #define SN7516X_DC 13
 //  #define SN7516X_SC 12
 /*** ONLYA board ***/
 //  #define SN7516X_TE 13
