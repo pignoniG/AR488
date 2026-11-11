@@ -670,8 +670,11 @@ enum receiveState GPIBbus::receiveData(Stream &dataStream, bool detectEoi, bool 
         DB_HEX_PRINT(bytes[0]);
       }
 #else
-      // Output the character to the serial port
-      dataStream.print((char)bytes[0]);
+      // Output the character to the serial port. With ++eot_escape 1, data bytes equal to
+      // the EOT character or to DLE are preceded by DLE, so an unescaped EOT always marks
+      // the end of a reply, even in binary data.
+      if (eot_esc && (bytes[0] == cfg.eot_ch || bytes[0] == AR_DLE)) dataStream.write(AR_DLE);
+      dataStream.write(bytes[0]);
 #endif
 
       // Byte counter

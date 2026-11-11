@@ -14,7 +14,7 @@
 #include "AR488_Eeprom.h"
 
 
-/***** FWVER "AR488 GPIB controller, ver. 0.53.46, 22/05/2026" *****/
+/***** FWVER "AR488 GPIB controller, ver. 0.53.46-gpibpi2, 11/11/2026" *****/
 
 /*
   Arduino IEEE-488 implementation by John Chajecki
@@ -229,6 +229,7 @@ static const char cmdHelpExtended[] PROGMEM = {
   "aspoll:\tSerial poll all instruments (alias = ++spoll all)\n"
   "dcl:\t\tSend unaddressed (all) device clear  [power on reset] (is the rst?)\n"
   "default:\tSet configuration to controller default settings\n"
+  "eot_escape:\tPrecede EOT and DLE (0x10) bytes in received data with DLE, so EOT marks only the end\n"
   "flags:\t\tDisplay handhsaking flags - bits 0 1 & 2 control Ready, ReadOk and SendOK\n"
   "id:\t\tShow interface ID information - see also > 'id name'; 'id serial'; 'id verstr'\n"
   "id name:\tShow/Set the name of the interface\n"
@@ -240,6 +241,7 @@ static const char cmdHelpExtended[] PROGMEM = {
   "ppoll:\t\tConduct a parallel poll\n"
   "ren:\t\tAssert or Unassert the REN signal\n"
   "repeat:\tRepeat a given command and return result\n"
+  "rxbuf:\t\tShow the size of the serial receive buffer in bytes\n"
   "send:\t\tSend to GPIB address; e.g. ++send 22,*idn?\n"
   "setvstr:\tDEPRECATED - see id verstr\n"
   "srqauto:\tAutomatically conduct serial poll when SRQ is asserted\n"
@@ -876,6 +878,7 @@ static cmdRec cmdHidx [] = {
   { "eos",         3, eos_h       },
   { "eot_char",    3, eot_char_h  },
   { "eot_enable",  3, eot_en_h    },
+  { "eot_escape",  3, eot_esc_h   },
   { "flags",       2, hflags_h    },
   { "fndl",        2, fndl_h      },
   { "help",        3, help_h      },
@@ -894,6 +897,7 @@ static cmdRec cmdHidx [] = {
   { "ren",         2, ren_h       },
   { "repeat",      2, repeat_h    },
   { "rst",         3, (void(*)(char*)) rst_h     },
+  { "rxbuf",       3, (void(*)(char*)) rxbuf_h   },
   { "trg",         2, trg_h       },
   { "savecfg",     3, (void(*)(char*)) save_h    },
   { "send",        2, send_h      },
@@ -1299,6 +1303,32 @@ void cmode_h(char *params) {
   } else {
     dataPort.println(gpibBus.isController());
   }
+}
+
+
+/***** gpibpi: show or enable/disable escaping of EOT and DLE bytes in received data *****/
+void eot_esc_h(char *params) {
+  uint16_t val;
+  if (params != NULL) {
+    if (notInRange(params, 0, 1, val)) return;
+    gpibBus.eot_esc = val ? true : false;
+    if (isVerb) {
+      dataPort.print(F("Escaping of EOT and DLE in data: "));
+      dataPort.println(val ? "ON" : "OFF");
+    }
+  } else {
+    dataPort.println(gpibBus.eot_esc);
+  }
+}
+
+
+/***** gpibpi: size of the serial receive buffer (bytes that can be sent ahead) *****/
+void rxbuf_h() {
+#ifdef SERIAL_RX_BUFFER_SIZE
+  dataPort.println(SERIAL_RX_BUFFER_SIZE);
+#else
+  dataPort.println(0);
+#endif
 }
 
 

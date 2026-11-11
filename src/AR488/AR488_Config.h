@@ -7,7 +7,7 @@
 
 
 /***** Firmware version *****/
-#define FWVER "AR488 GPIB controller, ver. 0.53.46, 22/05/2026"
+#define FWVER "AR488 GPIB controller, ver. 0.53.46-gpibpi2, 11/11/2026"
 
 
 /***** BOARD CONFIGURATION *****/
@@ -118,7 +118,7 @@
   #define AR_SERIAL_PORT Serial
   // #define AR_SERIAL_SWPORT
   // Set port operating speed
-  #define AR_SERIAL_SPEED 115200
+  #define AR_SERIAL_SPEED 500000   // gpibpi: exact on a 16 MHz AVR (115200 is 2.1% off), 4x faster
   // Enable Bluetooth (HC05) module?
   //#define AR_SERIAL_BT_ENABLE 12        // HC05 enable pin
   //#define AR_SERIAL_BT_NAME "AR488-BT"  // Bluetooth device name

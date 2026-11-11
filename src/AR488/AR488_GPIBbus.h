@@ -155,6 +155,8 @@ enum transmitMode: uint8_t {
 /***** GPIB CLASS OBJECT DEFINITION *****/
 /***** vvvvvvvvvvvvvvvvvvvvvvvvvvvv *****/
 
+#define AR_DLE 0x10   // gpibpi: escape byte for ++eot_escape
+
 class GPIBbus {
 
 
@@ -169,6 +171,10 @@ public:
 
 //  union GPIBconf cfg;
   GPIBcfg cfg;
+
+  // gpibpi: escape EOT/DLE bytes in received data (++eot_escape). Deliberately not
+  // part of cfg, so the EEPROM layout (and the saved interface name) is unchanged.
+  bool eot_esc = false;
 
   uint8_t cstate = 0;
 

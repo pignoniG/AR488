@@ -8,14 +8,16 @@ set -e
 cd "$(dirname "$0")"
 CPU=atmega328old; [ "$1" = new ] && CPU=atmega328
 OUT=$(mktemp -d)
-VER=$(sed -n 's/.*ver\. \([0-9.]*\),.*/\1/p' src/AR488/AR488_Config.h | head -1)
-# DECIMAL_DIG: Debian's core 1.8.7 needs it, avr-gcc 5.4 only defines it for C
+VER=$(sed -n 's/.*FWVER.*ver\. \([^,]*\),.*/\1/p' src/AR488/AR488_Config.h | head -1)
+# DECIMAL_DIG: Debian's core 1.8.7 needs it, avr-gcc 5.4 only defines it for C.
+# SERIAL_RX_BUFFER_SIZE: 256-byte serial receive buffer instead of 64 (reported by ++rxbuf),
+# so the host can send more ahead without overflowing it (the adapter has no flow control).
 arduino-builder -compile -hardware /usr/share/arduino/hardware \
   -tools /usr/share/arduino/hardware/tools -tools /usr/bin \
   -built-in-libraries /usr/share/arduino/hardware/arduino/avr/libraries \
   -fqbn arduino:avr:nano:cpu=$CPU -build-path "$OUT" \
   -prefs=runtime.tools.avr-gcc.path=/usr -prefs=runtime.tools.avrdude.path=/usr \
-  -prefs=compiler.cpp.extra_flags=-DDECIMAL_DIG=__DECIMAL_DIG__ \
+  "-prefs=compiler.cpp.extra_flags=-DDECIMAL_DIG=__DECIMAL_DIG__ -DSERIAL_RX_BUFFER_SIZE=256" \
   src/AR488/AR488.ino | grep -E "Sketch uses|Global variables"
 mkdir -p build
 cp "$OUT/AR488.ino.hex" "build/AR488_${VER}_nano_sn7516x_te6_dc13.hex"
