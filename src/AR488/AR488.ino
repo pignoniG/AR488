@@ -2736,6 +2736,9 @@ void fndl_h(char *params) {
 
   dataPort.println();
   gpibBus.cfg.rtmo = tmo;
+  // The scan leaves the bus addressed (deviceAddressed == TOLISTEN), so the next
+  // data write would skip addressing the current device and its data be lost.
+  gpibBus.unAddressDevice();
   gpibBus.setControls(CIDS);
 
 }
