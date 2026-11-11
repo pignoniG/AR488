@@ -730,7 +730,8 @@ enum receiveState GPIBbus::receiveData(Stream &dataStream, bool detectEoi, bool 
     DB_PRINT(F("EOI detected!"), "");
 #endif
     // If eot_enabled then add EOT character
-    if (cfg.eot_en) dataStream.print(cfg.eot_ch);
+    // write() sends the character itself; print() would send its decimal value as text
+    if (cfg.eot_en) dataStream.write(cfg.eot_ch);
   }
 
   // Verbose timeout error
